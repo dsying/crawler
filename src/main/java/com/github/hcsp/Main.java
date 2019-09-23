@@ -13,6 +13,7 @@ import org.jsoup.nodes.Element;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.Objects;
 import java.util.Set;
 
 public class Main {
@@ -61,9 +62,11 @@ public class Main {
     CloseableHttpClient httpclient = HttpClients.createDefault();
     HttpGet httpGet = new HttpGet(link);
     try (CloseableHttpResponse response1 = httpclient.execute(httpGet)) {
-      System.out.println(link);
-      HttpEntity entity1 = response1.getEntity();
-      return Jsoup.parse(EntityUtils.toString(entity1));
+      HttpEntity entity1 = null;
+      if (response1 != null) {
+        entity1 = response1.getEntity();
+      }
+      return Jsoup.parse(EntityUtils.toString(Objects.requireNonNull(entity1)));
     } catch (IOException e) {
       e.printStackTrace();
     }
