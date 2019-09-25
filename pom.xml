@@ -50,7 +50,17 @@
             <artifactId>jsoup</artifactId>
             <version>1.11.3</version>
         </dependency>
-
+        <!-- https://mvnrepository.com/artifact/com.h2database/h2 -->
+        <dependency>
+            <groupId>com.h2database</groupId>
+            <artifactId>h2</artifactId>
+            <version>1.4.197</version>
+        </dependency>
+        <dependency>
+            <groupId>com.google.code.findbugs</groupId>
+            <artifactId>annotations</artifactId>
+            <version>3.0.1</version>
+        </dependency>
 
     </dependencies>
 
@@ -98,6 +108,7 @@
                         <phase>verify</phase>
                         <goals>
                             <goal>check</goal>
+<!--                            <goal>gui</goal>-->
                         </goals>
                     </execution>
                 </executions>
