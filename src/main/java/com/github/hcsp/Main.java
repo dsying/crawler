@@ -32,7 +32,9 @@ public class Main {
       // 获取下一个链接
       while ((link = getNextLinkThenDelete(connection)) != null) {
         // 已处理 执行下一次循环
-        if (alreadyProcessed(connection, link)) continue;
+        if (alreadyProcessed(connection, link)) {
+          continue;
+        }
         // 不感兴趣的链接，不处理
         if (isInterestingLink(link)) {
           Document document = HttpGetAndParseHtml(link);
@@ -51,6 +53,7 @@ public class Main {
 
   /**
    * 当前链接是否处理过
+   *
    * @param connection
    * @param link
    * @return
@@ -58,11 +61,11 @@ public class Main {
    */
   private static boolean alreadyProcessed(Connection connection, String link) throws SQLException {
     ResultSet resultSet = null;
-    try (PreparedStatement ps = connection.prepareStatement("select link from links_already_processed where LINK = ?")){
+    try (PreparedStatement ps = connection.prepareStatement("select link from links_already_processed where LINK = ?")) {
       ps.setString(1, link);
       resultSet = ps.executeQuery();
       return resultSet.next();
-    }finally {
+    } finally {
       if (resultSet != null) {
         resultSet.close();
       }
@@ -71,6 +74,7 @@ public class Main {
 
   /**
    * 获取下一个待处理链接并从数据库中删除
+   *
    * @param connection
    * @return
    * @throws SQLException
@@ -78,7 +82,9 @@ public class Main {
   private static String getNextLinkThenDelete(Connection connection) throws SQLException {
     // 从待处理池子中捞一个来处理
     String link = getNextLink(connection, "select link from links_to_be_processed limit 1");
-    if (link == null) return null;
+    if (link == null) {
+      return null;
+    }
     // 处理完成后从池子包括数据库中删除
     insertOrDeleteOneLinkIntoDatabase(connection, link, "delete from LINKS_TO_BE_PROCESSED where LINK = ?");
     return link;
@@ -86,6 +92,7 @@ public class Main {
 
   /**
    * 插入待处理链接 links_to_be_processed表
+   *
    * @param connection
    * @param document
    * @throws SQLException
@@ -99,6 +106,7 @@ public class Main {
 
   /**
    * 插入或删除一条记录
+   *
    * @param connection
    * @param link
    * @param s
@@ -113,6 +121,7 @@ public class Main {
 
   /**
    * 获取 links_already_processed 或 links_to_be_processed 表中的 link
+   *
    * @param connection
    * @param sql
    * @return
@@ -130,6 +139,7 @@ public class Main {
 
   /**
    * 如果是新闻页面则放入NEWS表中
+   *
    * @param document
    * @param connection
    * @param link
@@ -142,7 +152,7 @@ public class Main {
         System.out.println(article.child(0).text());
         try (PreparedStatement ps = connection.prepareStatement("insert into NEWS (TITLE, CONTENT, URL, CREATED_AT, MODIFIED_AT) values (?,?,?,NOW(),NOW())")) {
           ps.setString(1, article.child(0).text());
-          ps.setString(2, article.html());
+          ps.setString(2, getNewContent(article));
           ps.setString(3, link);
           ps.execute();
         }
@@ -151,7 +161,23 @@ public class Main {
   }
 
   /**
+   * 获取新闻内容
+   *
+   * @param article
+   * @return
+   */
+  private static String getNewContent(Element article) {
+    ArrayList<Element> pElements = article.select(".art_content .art_p");
+    StringBuilder content = new StringBuilder();
+    for (Element element : pElements) {
+      content.append(element.text()).append('\n');
+    }
+    return content.toString();
+  }
+
+  /**
    * 使用jsoup根据url解析生成Document文档
+   *
    * @param link 网址
    * @return
    */
@@ -174,7 +200,8 @@ public class Main {
   }
 
   /**
-   *  是否为感兴趣的链接
+   * 是否为感兴趣的链接
+   *
    * @param link
    * @return
    */
