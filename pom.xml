@@ -111,7 +111,6 @@
                         <phase>verify</phase>
                         <goals>
                             <goal>check</goal>
-                            <!--                            <goal>gui</goal>-->
                         </goals>
                     </execution>
                 </executions>

@@ -20,6 +20,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Objects;
 
+
 public class Main {
   private static final String JDBC_URL = "jdbc:h2:file:/Users/dsying/Projects/hcsp/29_crawler/crawler/target/crawlerNew";
   private static final String USERNAME = "root";
@@ -69,6 +70,7 @@ public class Main {
       if (resultSet != null) {
         resultSet.close();
       }
+
     }
   }
 
