@@ -66,6 +66,7 @@
 
     <build>
         <plugins>
+            <!-- 测试插件 -->
             <plugin>
                 <artifactId>maven-surefire-plugin</artifactId>
                 <version>2.22.1</version>
@@ -73,6 +74,7 @@
                     <argLine>-Dfile.encoding=UTF-8</argLine>
                 </configuration>
             </plugin>
+            <!-- checkstyle 样式检查工具 -->
             <plugin>
                 <artifactId>maven-checkstyle-plugin</artifactId>
                 <version>3.0.0</version>
@@ -98,6 +100,7 @@
                     </dependency>
                 </dependencies>
             </plugin>
+            <!-- spotbugs bug检查工具-->
             <plugin>
                 <groupId>com.github.spotbugs</groupId>
                 <artifactId>spotbugs-maven-plugin</artifactId>
@@ -108,7 +111,7 @@
                         <phase>verify</phase>
                         <goals>
                             <goal>check</goal>
-<!--                            <goal>gui</goal>-->
+                            <!--                            <goal>gui</goal>-->
                         </goals>
                     </execution>
                 </executions>
@@ -120,6 +123,17 @@
                         <version>4.0.0-beta4</version>
                     </dependency>
                 </dependencies>
+            </plugin>
+            <!-- flyway 数据库迁移工具 -->
+            <plugin>
+                <groupId>org.flywaydb</groupId>
+                <artifactId>flyway-maven-plugin</artifactId>
+                <version>6.0.4</version>
+                <configuration>
+                    <url>jdbc:h2:file:./target/crawlerNew</url>
+                    <user>root</user>
+                    <password>root</password>
+                </configuration>
             </plugin>
         </plugins>
     </build>

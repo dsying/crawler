@@ -18,9 +18,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.Objects;
-import java.util.Set;
 
 public class Main {
   private static final String JDBC_URL = "jdbc:h2:file:/Users/dsying/Projects/hcsp/29_crawler/crawler/target/crawlerNew";
@@ -30,23 +28,12 @@ public class Main {
   @SuppressFBWarnings("DMI_CONSTANT_DB_PASSWORD")
   public static void main(String[] args) throws SQLException {
     try (Connection connection = DriverManager.getConnection(JDBC_URL, USERNAME, PASSWORD)) {
-      while (true) {
-        ArrayList<String> linkPool = loadUrlsFromDatabase(connection, "select link from links_to_be_processed");
-        Set<String> processedLinks = new HashSet<>(loadUrlsFromDatabase(connection, "select link from links_already_processed"));
-
-        if (linkPool.isEmpty()) {
-          break;
-        }
-        // 从待处理池子中捞一个来处理
-        // 处理完成后从池子包括数据库中删除
-        String link = linkPool.remove(linkPool.size() - 1);
-        insertOrDeleteOneLinkIntoDatabase(connection, link, "delete from LINKS_TO_BE_PROCESSED where LINK = ?");
-
-        // 如果已经处理过 则跳过
-        if (processedLinks.contains(link)) {
-          continue;
-        }
-
+      String link;
+      // 获取下一个链接
+      while ((link = getNextLinkThenDelete(connection)) != null) {
+        // 已处理 执行下一次循环
+        if (alreadyProcessed(connection, link)) continue;
+        // 不感兴趣的链接，不处理
         if (isInterestingLink(link)) {
           Document document = HttpGetAndParseHtml(link);
           // 把当前 文档中的a标签的链接放入 links_to_be_processed
@@ -60,6 +47,41 @@ public class Main {
 
     }
 
+  }
+
+  /**
+   * 当前链接是否处理过
+   * @param connection
+   * @param link
+   * @return
+   * @throws SQLException
+   */
+  private static boolean alreadyProcessed(Connection connection, String link) throws SQLException {
+    ResultSet resultSet = null;
+    try (PreparedStatement ps = connection.prepareStatement("select link from links_already_processed where LINK = ?")){
+      ps.setString(1, link);
+      resultSet = ps.executeQuery();
+      return resultSet.next();
+    }finally {
+      if (resultSet != null) {
+        resultSet.close();
+      }
+    }
+  }
+
+  /**
+   * 获取下一个待处理链接并从数据库中删除
+   * @param connection
+   * @return
+   * @throws SQLException
+   */
+  private static String getNextLinkThenDelete(Connection connection) throws SQLException {
+    // 从待处理池子中捞一个来处理
+    String link = getNextLink(connection, "select link from links_to_be_processed limit 1");
+    if (link == null) return null;
+    // 处理完成后从池子包括数据库中删除
+    insertOrDeleteOneLinkIntoDatabase(connection, link, "delete from LINKS_TO_BE_PROCESSED where LINK = ?");
+    return link;
   }
 
   /**
@@ -96,15 +118,14 @@ public class Main {
    * @return
    * @throws SQLException
    */
-  private static ArrayList<String> loadUrlsFromDatabase(Connection connection, String sql) throws SQLException {
-    ArrayList<String> results = new ArrayList<>();
+  private static String getNextLink(Connection connection, String sql) throws SQLException {
     try (PreparedStatement ps = connection.prepareStatement(sql);
          ResultSet resultSet = ps.executeQuery()) {
       while (resultSet.next()) {
-        results.add(resultSet.getString(1));
+        return resultSet.getString(1);
       }
     }
-    return results;
+    return null;
   }
 
   /**
