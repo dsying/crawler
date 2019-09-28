@@ -1,6 +1,5 @@
 package com.github.hcsp;
 
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.apache.http.HttpEntity;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
@@ -29,7 +28,6 @@ public class Crawler{
     }
   }
 
-  @SuppressFBWarnings("DMI_CONSTANT_DB_PASSWORD")
   public void run() throws SQLException {
       String link;
       // 获取下一个链接

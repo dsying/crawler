@@ -34,18 +34,18 @@ public class News {
   }
 
   public Timestamp getCreatedAt() {
-    return createdAt;
+    return (Timestamp) createdAt.clone();
   }
 
   public void setCreatedAt(Timestamp createdAt) {
-    this.createdAt = createdAt;
+    this.createdAt = (Timestamp) createdAt.clone();
   }
 
   public Timestamp getModifiedAt() {
-    return modifiedAt;
+    return (Timestamp) modifiedAt.clone();
   }
 
   public void setModifiedAt(Timestamp modifiedAt) {
-    this.modifiedAt = modifiedAt;
+    this.modifiedAt = (Timestamp) modifiedAt.clone();
   }
 }

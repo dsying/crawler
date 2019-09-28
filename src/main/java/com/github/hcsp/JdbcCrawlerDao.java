@@ -1,5 +1,7 @@
 package com.github.hcsp;
 
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
@@ -12,6 +14,8 @@ class JdbcCrawlerDao implements CrawlerDao {
   private static final String PASSWORD = "root";
 
   private final Connection connection;
+
+  @SuppressFBWarnings("DMI_CONSTANT_DB_PASSWORD")
   JdbcCrawlerDao() {
     try {
       this.connection = DriverManager.getConnection(JDBC_URL, USERNAME, PASSWORD);

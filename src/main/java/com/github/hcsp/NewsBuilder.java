@@ -32,12 +32,12 @@ public final class NewsBuilder {
   }
 
   public NewsBuilder withCreatedAt(Timestamp createdAt) {
-    this.createdAt = createdAt;
+    this.createdAt = (Timestamp) createdAt.clone();
     return this;
   }
 
   public NewsBuilder withModifiedAt(Timestamp modifiedAt) {
-    this.modifiedAt = modifiedAt;
+    this.modifiedAt = (Timestamp) modifiedAt.clone();
     return this;
   }
 
