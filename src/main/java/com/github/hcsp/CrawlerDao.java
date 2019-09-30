@@ -11,9 +11,11 @@ public interface CrawlerDao {
 
   void addLinksToAlreadyProcessed(String href) throws SQLException;
 
-  void insertOrDeleteOneLinkIntoDatabase(String link, String sql) throws SQLException;
+  void deleteLink(String link) throws SQLException;
 
-  String getNextLink(String sql) throws SQLException;
+  void insertLink(String link, String sql) throws SQLException;
 
-  void storeIntoDataBaseIfItIsNewsPage(News news) throws SQLException;
+  String getNextLink() throws SQLException;
+
+  void insertNews(News news) throws SQLException;
 }
