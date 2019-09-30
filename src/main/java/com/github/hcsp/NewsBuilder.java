@@ -1,9 +1,11 @@
 package com.github.hcsp;
 
+
 public final class NewsBuilder {
   private String title;
   private String content;
   private String url;
+
   private NewsBuilder() {
   }
 
@@ -25,6 +27,7 @@ public final class NewsBuilder {
     this.url = url;
     return this;
   }
+
 
   public News build() {
     News news = new News();
