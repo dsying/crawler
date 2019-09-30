@@ -11,13 +11,14 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class MyBatisCrawlerDao implements CrawlerDao{
-  private SqlSessionFactory sqlSessionFactory;
+  private SqlSession sqlSession;
   private static final String NAMESPACE = "com.github.hcsp.CrawlerDao";
 
   public MyBatisCrawlerDao() {
     String resource = "db/mybatis/mybatis-config.xml";
     try (InputStream inputStream = Resources.getResourceAsStream(resource)) {
-      this.sqlSessionFactory = new SqlSessionFactoryBuilder().build(inputStream);
+      SqlSessionFactory sqlSessionFactory = new SqlSessionFactoryBuilder().build(inputStream);
+      this.sqlSession = sqlSessionFactory.openSession();
     } catch (IOException e) {
       throw new RuntimeException(e);
     }
@@ -25,21 +26,17 @@ public class MyBatisCrawlerDao implements CrawlerDao{
 
   @Override
   public boolean alreadyProcessed(String link) {
-    Integer count;
-    try (SqlSession sqlSession = sqlSessionFactory.openSession()) {
-      count = sqlSession.selectOne(NAMESPACE + ".alreadyProcessed", link);
-    }
-    return count > 0;
+    return sqlSession.selectOne(NAMESPACE + ".alreadyProcessed", link);
   }
 
   @Override
   public String getNextLinkThenDelete() {
-      String link = getNextLink();
-      if (link == null) {
-        return null;
-      }
-      deleteLink(link);
-      return link;
+    String link = getNextLink();
+    if (link == null) {
+      return null;
+    }
+    deleteLink(link);
+    return link;
   }
 
   @Override
@@ -54,9 +51,7 @@ public class MyBatisCrawlerDao implements CrawlerDao{
 
   @Override
   public void deleteLink(String link) {
-    try (SqlSession sqlSession = sqlSessionFactory.openSession()) {
-      sqlSession.selectOne(NAMESPACE + ".deleteLink", link);
-    }
+    sqlSession.selectOne(NAMESPACE + ".deleteLink", link);
   }
 
   @Override
@@ -64,17 +59,13 @@ public class MyBatisCrawlerDao implements CrawlerDao{
     Map<String, Object> param = new HashMap<>();
     param.put("link", link);
     param.put("tableName", tableName);
-    try (SqlSession sqlSession = sqlSessionFactory.openSession()) {
-      sqlSession.selectOne(NAMESPACE + ".insertLink", param);
-    }
+    sqlSession.selectOne(NAMESPACE + ".insertLink", param);
   }
 
 
   @Override
   public String getNextLink() {
-    try (SqlSession sqlSession = sqlSessionFactory.openSession()) {
-      return sqlSession.selectOne(NAMESPACE + ".getNextLink");
-    }
+    return sqlSession.selectOne(NAMESPACE + ".getNextLink");
   }
 
   @Override
@@ -83,8 +74,6 @@ public class MyBatisCrawlerDao implements CrawlerDao{
     param.put("title", news.getTitle());
     param.put("content", news.getContent());
     param.put("url", news.getUrl());
-    try (SqlSession sqlSession = sqlSessionFactory.openSession()) {
-      sqlSession.selectOne(NAMESPACE + ".insertNews");
-    }
+    sqlSession.selectOne(NAMESPACE + ".insertNews", param);
   }
 }
