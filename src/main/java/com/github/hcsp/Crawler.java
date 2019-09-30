@@ -18,7 +18,7 @@ import java.util.Objects;
 
 public class Crawler{
 
-  private CrawlerDao dao = new JdbcCrawlerDao();
+  private CrawlerDao dao = new MyBatisCrawlerDao();
 
   public static void main(String[] args) {
     try {
@@ -65,7 +65,7 @@ public class Crawler{
                 .withTitle(article.child(0).text())
                 .withContent(getNewContent(article))
                 .withUrl(link).build();
-        dao.storeIntoDataBaseIfItIsNewsPage(news);
+        dao.insertNews(news);
       }
     }
   }
