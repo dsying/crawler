@@ -52,8 +52,15 @@ public class Crawler{
   private void addLinksToNotProcessed(Document document) throws SQLException {
     for (Element aTag : document.select("a")) {
       String href = aTag.attr("href");
-      dao.addLinksToNotProcessed(href);
+      if (isUselessLink(href)) {
+        continue;
+      }
+      dao.addLinksToNotProcessed(autoCompleteHTTP(href));
     }
+  }
+
+  private boolean isUselessLink(String href) {
+    return href.toLowerCase().startsWith("javascript") || href.startsWith("#") || href.equals("");
   }
 
   private void storeIntoDataBaseIfItIsNewsPage(Document document, String link) throws SQLException {
@@ -80,12 +87,9 @@ public class Crawler{
   }
 
   private static Document HttpGetAndParseHtml(String link) {
-    if (link.startsWith("//")) {
-      link = "https:" + link;
-    }
-    CloseableHttpClient httpclient = HttpClients.createDefault();
-    HttpGet httpGet = new HttpGet(link);
-    try (CloseableHttpResponse response1 = httpclient.execute(httpGet)) {
+    CloseableHttpClient httpClient = HttpClients.createDefault();
+    HttpGet httpGet = new HttpGet(autoCompleteHTTP(link));
+    try (CloseableHttpResponse response1 = httpClient.execute(httpGet)) {
       HttpEntity entity1 = null;
       if (response1 != null) {
         entity1 = response1.getEntity();
@@ -95,6 +99,13 @@ public class Crawler{
       e.printStackTrace();
     }
     return null;
+  }
+
+  private static String autoCompleteHTTP(String link) {
+    if (link.startsWith("//")) {
+      link = "https:" + link;
+    }
+    return link;
   }
 
   private static boolean isInterestingLink(String link) {

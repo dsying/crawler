@@ -6,32 +6,32 @@
 <mapper namespace="com.github.hcsp.CrawlerDao">
 
     <select id="alreadyProcessed" parameterType="String" resultType="int">
-        select count(1) from LINKS_ALREADY_PROCESSED where LINK = #{link}
+        select count(1) from links_already_processed where LINK = #{link}
     </select>
 
     <select id="getNextLink" resultType="String">
-        select LINK from LINKS_TO_BE_PROCESSED limit 1
+        select LINK from links_to_be_processed limit 1
     </select>
 
     <delete id="deleteLink" parameterType="String">
-        delete from LINKS_TO_BE_PROCESSED where LINK = #{link}
+        delete from links_to_be_processed where LINK = #{link}
     </delete>
 
     <insert id="insertLink" parameterType="HashMap">
         insert into
         <choose>
-            <when test="tableName == LINKS_TO_BE_PROCESSED">
-                LINKS_TO_BE_PROCESSED
+            <when test="tableName == 'links_to_be_processed'">
+                links_to_be_processed
             </when>
             <otherwise>
-                LINKS_ALREADY_PROCESSED
+                links_already_processed
             </otherwise>
         </choose>
         (link) values ( #{link} )
     </insert>
 
     <insert id="insertNews" parameterType="map">
-        insert into NEWS (TITLE, CONTENT, URL, CREATED_AT, MODIFIED_AT)
+        insert into news (TITLE, CONTENT, URL, createdAt, modifiedAt)
             values (#{title}, #{content}, #{url}, NOW(), NOW())
     </insert>
 </mapper>
