@@ -53,7 +53,7 @@ class JdbcCrawlerDao implements CrawlerDao {
 
   @Override
   public void addLinksToNotProcessed(String href) throws SQLException {
-    insertLink(href, "LINKS_TO_BE_PROCESSED");
+    insertLink(href, "links_to_be_processed");
   }
 
   @Override
@@ -63,7 +63,7 @@ class JdbcCrawlerDao implements CrawlerDao {
 
   @Override
   public void deleteLink(String link) throws SQLException {
-     try (PreparedStatement ps = connection.prepareStatement("delete from LINKS_TO_BE_PROCESSED where LINK = ?")) {
+     try (PreparedStatement ps = connection.prepareStatement("delete from links_to_be_processed where LINK = ?")) {
       ps.setString(1, link);
       ps.execute();
     }
@@ -92,7 +92,7 @@ class JdbcCrawlerDao implements CrawlerDao {
 
   @Override
   public void insertNews(News news) throws SQLException {
-    try (PreparedStatement ps = connection.prepareStatement("insert into NEWS (TITLE, CONTENT, URL, CREATED_AT, MODIFIED_AT) values (?,?,?,NOW(),NOW())")) {
+    try (PreparedStatement ps = connection.prepareStatement("insert into news (TITLE, CONTENT, URL, CREATED_AT, MODIFIED_AT) values (?,?,?,NOW(),NOW())")) {
       ps.setString(1, news.getTitle());
       ps.setString(2, news.getContent());
       ps.setString(3, news.getUrl());

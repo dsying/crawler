@@ -18,7 +18,7 @@ public class MyBatisCrawlerDao implements CrawlerDao{
     String resource = "db/mybatis/mybatis-config.xml";
     try (InputStream inputStream = Resources.getResourceAsStream(resource)) {
       SqlSessionFactory sqlSessionFactory = new SqlSessionFactoryBuilder().build(inputStream);
-      this.sqlSession = sqlSessionFactory.openSession();
+      this.sqlSession = sqlSessionFactory.openSession(true);
     } catch (IOException e) {
       throw new RuntimeException(e);
     }
@@ -26,7 +26,8 @@ public class MyBatisCrawlerDao implements CrawlerDao{
 
   @Override
   public boolean alreadyProcessed(String link) {
-    return sqlSession.selectOne(NAMESPACE + ".alreadyProcessed", link);
+    int count = sqlSession.selectOne(NAMESPACE + ".alreadyProcessed", link);
+    return count > 0;
   }
 
   @Override
@@ -41,17 +42,17 @@ public class MyBatisCrawlerDao implements CrawlerDao{
 
   @Override
   public void addLinksToNotProcessed(String href) {
-    insertLink(href, "LINKS_TO_BE_PROCESSED");
+    insertLink(href, "links_to_be_processed");
   }
 
   @Override
   public void addLinksToAlreadyProcessed(String href) {
-    insertLink(href, "LINKS_ALREADY_PROCESSED");
+    insertLink(href, "links_already_processed");
   }
 
   @Override
   public void deleteLink(String link) {
-    sqlSession.selectOne(NAMESPACE + ".deleteLink", link);
+    sqlSession.delete(NAMESPACE + ".deleteLink", link);
   }
 
   @Override
@@ -59,7 +60,7 @@ public class MyBatisCrawlerDao implements CrawlerDao{
     Map<String, Object> param = new HashMap<>();
     param.put("link", link);
     param.put("tableName", tableName);
-    sqlSession.selectOne(NAMESPACE + ".insertLink", param);
+    sqlSession.insert(NAMESPACE + ".insertLink", param);
   }
 
 
@@ -74,6 +75,6 @@ public class MyBatisCrawlerDao implements CrawlerDao{
     param.put("title", news.getTitle());
     param.put("content", news.getContent());
     param.put("url", news.getUrl());
-    sqlSession.selectOne(NAMESPACE + ".insertNews", param);
+    sqlSession.insert(NAMESPACE + ".insertNews", param);
   }
 }
