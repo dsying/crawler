@@ -60,7 +60,7 @@ public class Crawler{
   }
 
   private boolean isUselessLink(String href) {
-    return href.startsWith("JavaScript") || href.startsWith("#") || href.equals("");
+    return href.toLowerCase().startsWith("javascript") || href.startsWith("#") || href.equals("");
   }
 
   private void storeIntoDataBaseIfItIsNewsPage(Document document, String link) throws SQLException {
