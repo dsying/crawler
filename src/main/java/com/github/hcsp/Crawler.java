@@ -16,19 +16,17 @@ import java.util.ArrayList;
 import java.util.Objects;
 
 
-public class Crawler{
+public class Crawler extends Thread{
 
-  private CrawlerDao dao = new MyBatisCrawlerDao();
+  private CrawlerDao dao;
 
-  public static void main(String[] args) {
-    try {
-      new Crawler().run();
-    } catch (SQLException e) {
-      e.printStackTrace();
-    }
+  public Crawler(CrawlerDao dao) {
+    this.dao = dao;
   }
 
-  public void run() throws SQLException {
+  @Override
+  public void run() {
+    try {
       String link;
       // 获取下一个链接
       while ((link = dao.getNextLinkThenDelete()) != null) {
@@ -47,6 +45,9 @@ public class Crawler{
           dao.addLinksToAlreadyProcessed(link);
         }
       }
+    } catch (SQLException e) {
+      throw new RuntimeException(e);
+    }
   }
 
   private void addLinksToNotProcessed(Document document) throws SQLException {

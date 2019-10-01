@@ -31,7 +31,8 @@ public class MyBatisCrawlerDao implements CrawlerDao{
   }
 
   @Override
-  public String getNextLinkThenDelete() {
+  public synchronized String getNextLinkThenDelete() {
+    // 该方法执行了查询和删除两个操作， 多线程状态下有可能出现问题， 因此给方法添加 synchronized, 以当前实例对象作为锁
     String link = getNextLink();
     if (link == null) {
       return null;
